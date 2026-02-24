@@ -4,10 +4,10 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const palette = {
-  input: 'border-blue-500 bg-blue-950/90 text-blue-100',
-  endpoint: 'border-violet-500 bg-violet-950/85 text-violet-100',
-  output: 'border-emerald-500 bg-emerald-950/90 text-emerald-100',
-  error: 'border-rose-500 bg-rose-950/90 text-rose-100',
+  input: 'border-blue-500 text-blue-100',
+  endpoint: 'border-violet-500 text-violet-100',
+  output: 'border-emerald-500 text-emerald-100',
+  error: 'border-rose-500 text-rose-100',
 };
 
 function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
@@ -16,7 +16,7 @@ function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`w-64 rounded-xl border p-3 text-xs shadow-lg ${palette[t]} ${selected ? 'ring-2 ring-violet-400' : ''}`}
+      className={`w-64 rounded-xl border bg-slate-900/95 p-3 text-xs shadow-lg ${palette[t]} ${selected ? 'ring-2 ring-violet-400' : ''}`}
     >
       <Handle type="target" position={Position.Left} className="!h-3 !w-3 !bg-slate-100" />
       <div className="font-semibold text-sm">{data.title}</div>

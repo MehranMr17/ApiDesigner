@@ -1,112 +1,149 @@
 # API Designer Pro
 
-A production-grade, fully static visual API design studio for backend engineers and architects.
+<div align="center">
 
-## Overview
+**A modern, production-ready visual API architecture studio**  
+طراحی بصری API در سطح حرفه‌ای برای تیم‌های بک‌اند
 
-API Designer Pro helps you model API contracts visually with a node-based diagram experience similar to architecture/ER tools — while staying 100% frontend-only for easy GitHub Pages deployment.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-API%20Designer%20Pro-22c55e?style=for-the-badge)](https://mehranmr17.github.io/ApiDesigner/)
+[![Frontend Only](https://img.shields.io/badge/100%25-Static%20Frontend-0ea5e9?style=for-the-badge)](#english)
+[![License](https://img.shields.io/badge/License-MIT-a855f7?style=for-the-badge)](#license)
 
-- **Framework**: React + TypeScript + Vite
-- **State**: Zustand + persist middleware (localStorage)
-- **Diagram Engine**: React Flow
-- **Styling**: TailwindCSS (dark-first)
-- **Animation**: Framer Motion (lightweight)
+### 🌐 Live Access | دسترسی آنلاین
+## **https://mehranmr17.github.io/ApiDesigner/**
 
-## Why this project
+</div>
 
-This project is designed for teams that want:
-- fast API exploration and iteration,
-- structured request/response/error schema modeling,
-- zero backend operational overhead,
-- portable local backups and OpenAPI export.
+---
 
-## Core Capabilities
+## Language / زبان
 
-### Visual Modeling
-- Endpoint, Input, Output, and Error node types
-- Arrow-based flows with semantic labels
-- Right-side inspector for inline editing
-- Snap-to-grid, zoom/pan, minimap, and auto-layout
+- [🇺🇸 English](#english)
+- [🇮🇷 فارسی](#فارسی)
 
-### JSON Schema-Oriented Design
-- Field-level schema editing (`name`, `type`, `required`)
-- Output/Error schemas represented as structured JSON objects
+---
+
+## English
+
+### Overview
+API Designer Pro is a visual tool for backend engineers and software architects to:
+- model API endpoints as interactive diagram nodes,
+- define input/output/error JSON structures,
+- manage status-aware flows between components,
+- maintain multiple saved projects,
+- export OpenAPI/JSON/SVG artifacts.
+
+### Key Features
+- Node types: Endpoint / Input / Output / Error
+- Arrow flows with editable labels and status codes
+- Right-side property inspector
+- JSON field modeling (`name`, `type`, `required`)
 - Default error schema:
   - `errorCode: string`
   - `message: string`
   - `metadata?: object`
-
-### Productivity
-- Keyboard shortcuts:
-  - `N` → New endpoint
-  - `I` → Add input
-  - `O` → Add output
-  - `E` → Add error
-  - `Delete` → Remove selected node
-  - `Ctrl+S` / `Cmd+S` → Save (state is also auto-persisted)
-- HTTP status suggestions toggle:
-  - `200`, `201`, `400`, `401`, `403`, `404`, `409`, `500`
-
-### Data Portability
-- Export Project JSON (backup)
-- Import Project JSON (restore)
+- Multi-project workflow (create / rename / switch)
+- Import/Export project JSON
 - Export OpenAPI JSON
-- Export Diagram SVG
+- Export SVG
+- Keyboard shortcuts (`N`, `I`, `O`, `E`, `Delete`, `Ctrl/Cmd+S`)
 
-## Static Deployment Guarantees
+### Tech Stack
+- React + TypeScript + Vite
+- Zustand (persist)
+- React Flow
+- TailwindCSS
+- Framer Motion
 
-This application is intentionally built for static hosting:
-- No backend server
-- No database
-- No Firebase/external storage API
-- No authentication
-- No environment variables required
+### Static Deployment
+This app is fully static:
+- no backend
+- no database
+- no auth
+- no env variables required
 
-It runs correctly on **GitHub Pages subpaths** using:
+GitHub Pages compatibility:
 - `HashRouter`
 - Vite `base: './'`
 
-## Default First-Run State
-
-On first load, the app starts minimal and clean:
-- `POST /example` endpoint
-- one default `200` success response node
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm 9+
-
-### Development
-
+### Local Setup
 ```bash
+git clone https://github.com/MehranMr17/ApiDesigner.git
+cd ApiDesigner
 npm install
 npm run dev
 ```
 
-### Production Build
-
+### Build
 ```bash
 npm run build
+npm run preview
 ```
 
-The build output is generated in `dist/` and can be deployed directly to GitHub Pages.
+---
 
-## Project Structure
+## فارسی
 
-```text
-src/
-  components/      # memoized UI blocks (node card, toolbar, inspector)
-  lib/             # modeling/export helpers
-  store/           # Zustand global store + persistence logic
-  types.ts         # shared domain types
-  App.tsx          # canvas shell and React Flow orchestration
-  main.tsx         # app bootstrap + HashRouter
+### معرفی
+API Designer Pro یک ابزار بصری برای مهندسان بک‌اند و معماران نرم‌افزار است تا بتوانند:
+- اندپوینت‌های API را به‌صورت دیاگرام طراحی کنند،
+- ساختار JSON برای ورودی/خروجی/خطا تعریف کنند،
+- جریان داده و status codeها را مدیریت کنند،
+- چند پروژه را هم‌زمان نگه‌داری و جابه‌جا کنند،
+- خروجی OpenAPI/JSON/SVG بگیرند.
+
+### امکانات اصلی
+- انواع نود: Endpoint / Input / Output / Error
+- اتصال‌های فلش‌دار با label و status code قابل ویرایش
+- پنل تنظیمات سمت راست
+- مدل‌سازی فیلدهای JSON (`name`، `type`، `required`)
+- ساختار پیش‌فرض خطا:
+  - `errorCode: string`
+  - `message: string`
+  - `metadata?: object`
+- مدیریت چند پروژه (ایجاد / تغییر نام / سوییچ)
+- ورود/خروج پروژه با JSON
+- خروجی OpenAPI JSON
+- خروجی SVG
+- کلیدهای میانبر (`N`, `I`, `O`, `E`, `Delete`, `Ctrl/Cmd+S`)
+
+### تکنولوژی‌ها
+- React + TypeScript + Vite
+- Zustand (به‌همراه persist)
+- React Flow
+- TailwindCSS
+- Framer Motion
+
+### انتشار استاتیک
+این پروژه کاملاً فرانت‌اند و استاتیک است:
+- بدون بک‌اند
+- بدون دیتابیس
+- بدون احراز هویت
+- بدون نیاز به env
+
+سازگار با GitHub Pages با:
+- `HashRouter`
+- Vite `base: './'`
+
+### اجرای محلی
+```bash
+git clone https://github.com/MehranMr17/ApiDesigner.git
+cd ApiDesigner
+npm install
+npm run dev
 ```
 
-## Notes
+### بیلد
+```bash
+npm run build
+npm run preview
+```
 
-- All edits persist locally via browser storage and restore automatically.
-- Imported project JSON should match the exported schema format.
-- OpenAPI export is intentionally lightweight and focused on designed nodes.
+---
+
+## Links
+- Live Project: https://mehranmr17.github.io/ApiDesigner/
+- Repository: https://github.com/MehranMr17/ApiDesigner
+
+## License
+MIT
