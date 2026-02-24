@@ -26,6 +26,10 @@ function Canvas() {
   const setSelectedEdge = useApiDesignerStore((s) => s.setSelectedEdge);
   const addNode = useApiDesignerStore((s) => s.addNode);
   const deleteSelected = useApiDesignerStore((s) => s.deleteSelected);
+  const selectedNodeId = useApiDesignerStore((s) => s.selectedNodeId);
+  const copySelectedNode = useApiDesignerStore((s) => s.copySelectedNode);
+  const pasteCopiedNode = useApiDesignerStore((s) => s.pasteCopiedNode);
+  const undo = useApiDesignerStore((s) => s.undo);
 
   const nodeTypes = useMemo(
     () => ({ input: ApiNodeCard, endpoint: ApiNodeCard, output: ApiNodeCard, error: ApiNodeCard }),
@@ -51,6 +55,23 @@ function Canvas() {
         event.preventDefault();
         return;
       }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c') {
+        if (selectedNodeId) {
+          event.preventDefault();
+          copySelectedNode();
+        }
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v') {
+        event.preventDefault();
+        pasteCopiedNode();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        undo();
+        return;
+      }
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
       const key = event.key.toLowerCase();
       if (key === 'n') addNode('endpoint');
@@ -59,7 +80,7 @@ function Canvas() {
       if (key === 'e') addNode('error');
       if (event.key === 'Delete') deleteSelected();
     },
-    [addNode, deleteSelected],
+    [addNode, copySelectedNode, deleteSelected, pasteCopiedNode, selectedNodeId, undo],
   );
 
   useEffect(() => {
@@ -112,7 +133,7 @@ function Canvas() {
         </div>
         <Inspector />
 
-        <div className="absolute bottom-20 left-3 grid gap-2">
+        <div className="absolute bottom-3 left-3 flex items-end gap-3">
           <div className="rounded-md border border-slate-700 bg-slate-900/90 px-3 py-2 text-[11px] text-slate-200 shadow-lg">
             <div className="font-medium">Helper</div>
             <div>N / I / O / E: add nodes</div>
