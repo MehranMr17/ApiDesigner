@@ -1,7 +1,7 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
+import type { ApiNode } from '../types';
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import type { ApiNodeData } from '../types';
 
 const palette = {
   input: 'border-blue-500/50 bg-blue-500/10 text-blue-200',
@@ -10,7 +10,7 @@ const palette = {
   error: 'border-rose-500/50 bg-rose-500/10 text-rose-200',
 };
 
-function ApiNodeCard({ data, type, selected }: NodeProps) {
+function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
   const t = (type ?? 'endpoint') as keyof typeof palette;
   return (
     <motion.div
