@@ -33,6 +33,7 @@ type State = {
   activeProjectId: string;
   copiedNode: ApiNode | null;
   history: Array<{ nodes: ApiNode[]; edges: ApiEdge[]; selectedNodeId: string | null; selectedEdgeId: string | null }>;
+  future: Array<{ nodes: ApiNode[]; edges: ApiEdge[]; selectedNodeId: string | null; selectedEdgeId: string | null }>;
   setSelectedNode: (nodeId: string | null) => void;
   setSelectedEdge: (edgeId: string | null) => void;
   onNodesChange: (changes: NodeChange<ApiNode>[]) => void;
@@ -56,6 +57,7 @@ type State = {
   copySelectedNode: () => void;
   pasteCopiedNode: () => void;
   undo: () => void;
+  redo: () => void;
 };
 
 const syncProjects = (state: State, nodes: ApiNode[], edges: ApiEdge[]): ProjectEntry[] =>
@@ -96,6 +98,7 @@ export const useApiDesignerStore = create<State>()(
       activeProjectId: initialProjectEntry.id,
       copiedNode: null,
       history: [],
+      future: [],
       setSelectedNode: (selectedNodeId) => set({ selectedNodeId, selectedEdgeId: null }),
       setSelectedEdge: (selectedEdgeId) => set({ selectedEdgeId, selectedNodeId: null }),
       onNodesChange: (changes) =>
@@ -128,7 +131,7 @@ export const useApiDesignerStore = create<State>()(
       updateNode: (nodeId, patch) =>
         set((s) => {
           const nodes = s.nodes.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, ...patch } } : n));
-          return { nodes, history: pushHistory(s), projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, s.edges) };
         }),
       updateEdge: (edgeId, patch) =>
         set((s) => {
@@ -145,7 +148,7 @@ export const useApiDesignerStore = create<State>()(
               },
             };
           });
-          return { edges, projects: syncProjects(s, s.nodes, edges) };
+          return { edges, history: pushHistory(s), future: [], projects: syncProjects(s, s.nodes, edges) };
         }),
       addNode: (type) =>
         set((s) => {
@@ -179,18 +182,18 @@ export const useApiDesignerStore = create<State>()(
             });
           }
           const nodes = [...s.nodes, base];
-          return { nodes, edges, history: pushHistory(s), projects: syncProjects(s, nodes, edges) };
+          return { nodes, edges, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, edges) };
         }),
       deleteSelected: () =>
         set((s) => {
           if (s.selectedNodeId) {
             const nodes = s.nodes.filter((n) => n.id !== s.selectedNodeId);
             const edges = s.edges.filter((e) => e.source !== s.selectedNodeId && e.target !== s.selectedNodeId);
-            return { nodes, edges, selectedNodeId: null, history: pushHistory(s), projects: syncProjects(s, nodes, edges) };
+            return { nodes, edges, selectedNodeId: null, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, edges) };
           }
           if (s.selectedEdgeId) {
             const edges = s.edges.filter((e) => e.id !== s.selectedEdgeId);
-            return { edges, selectedEdgeId: null, projects: syncProjects(s, s.nodes, edges) };
+            return { edges, selectedEdgeId: null, history: pushHistory(s), future: [], projects: syncProjects(s, s.nodes, edges) };
           }
           return s;
         }),
@@ -201,7 +204,7 @@ export const useApiDesignerStore = create<State>()(
               ? { ...n, data: { ...n.data, schema: [...n.data.schema, makeField('field', 'string', false)] } }
               : n,
           );
-          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, s.edges) };
         }),
       updateField: (nodeId, fieldId, patch) =>
         set((s) => {
@@ -213,14 +216,14 @@ export const useApiDesignerStore = create<State>()(
                 }
               : n,
           );
-          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, s.edges) };
         }),
       removeField: (nodeId, fieldId) =>
         set((s) => {
           const nodes = s.nodes.map((n) =>
             n.id === nodeId ? { ...n, data: { ...n.data, schema: n.data.schema.filter((f) => f.id !== fieldId) } } : n,
           );
-          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, s.edges) };
         }),
       toggleStatus: (status) =>
         set((s) => ({
@@ -289,7 +292,7 @@ export const useApiDesignerStore = create<State>()(
           const cloned = cloneNodeForPaste(source);
 
           const nodes = [...s.nodes, cloned];
-          return { nodes, history: pushHistory(s), projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), future: [], projects: syncProjects(s, nodes, s.edges) };
         }),
       copySelectedNode: () =>
         set((s) => {
@@ -307,6 +310,7 @@ export const useApiDesignerStore = create<State>()(
             selectedNodeId: cloned.id,
             selectedEdgeId: null,
             history: pushHistory(s),
+            future: [],
             projects: syncProjects(s, nodes, s.edges),
           };
         }),
@@ -315,13 +319,47 @@ export const useApiDesignerStore = create<State>()(
           const last = s.history[s.history.length - 1];
           if (!last) return s;
           const history = s.history.slice(0, -1);
+          const future = [
+            ...s.future,
+            {
+              nodes: s.nodes,
+              edges: s.edges,
+              selectedNodeId: s.selectedNodeId,
+              selectedEdgeId: s.selectedEdgeId,
+            },
+          ].slice(-50);
           return {
             nodes: last.nodes,
             edges: last.edges,
             selectedNodeId: last.selectedNodeId,
             selectedEdgeId: last.selectedEdgeId,
             history,
+            future,
             projects: syncProjects(s, last.nodes, last.edges),
+          };
+        }),
+      redo: () =>
+        set((s) => {
+          const next = s.future[s.future.length - 1];
+          if (!next) return s;
+          const future = s.future.slice(0, -1);
+          const history = [
+            ...s.history,
+            {
+              nodes: s.nodes,
+              edges: s.edges,
+              selectedNodeId: s.selectedNodeId,
+              selectedEdgeId: s.selectedEdgeId,
+            },
+          ].slice(-50);
+          return {
+            nodes: next.nodes,
+            edges: next.edges,
+            selectedNodeId: next.selectedNodeId,
+            selectedEdgeId: next.selectedEdgeId,
+            history,
+            future,
+            projects: syncProjects(s, next.nodes, next.edges),
           };
         }),
     }),
