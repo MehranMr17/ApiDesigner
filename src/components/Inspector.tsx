@@ -15,6 +15,7 @@ function Inspector() {
   const addField = useApiDesignerStore((s) => s.addField);
   const updateField = useApiDesignerStore((s) => s.updateField);
   const removeField = useApiDesignerStore((s) => s.removeField);
+  const copyNode = useApiDesignerStore((s) => s.copyNode);
 
   const onText = useCallback(
     (key: 'title' | 'method' | 'path', value: string) => {
@@ -65,6 +66,9 @@ function Inspector() {
       <h2 className="mb-3 text-sm font-semibold text-slate-100">Properties</h2>
       <label className="mb-2 block text-xs text-slate-400">Title</label>
       <input className="mb-2 w-full rounded border border-slate-700 bg-slate-900 px-2 py-1" value={node.data.title} onChange={(e) => onText('title', e.target.value)} />
+      {(node.type === 'input' || node.type === 'output' || node.type === 'error') && (
+        <button className="mb-2 rounded bg-slate-800 px-2 py-1 text-xs text-slate-100" onClick={() => copyNode(node.id)}>Copy Node</button>
+      )}
       {node.type === 'endpoint' && (
         <>
           <input className="mb-2 w-full rounded border border-slate-700 bg-slate-900 px-2 py-1" value={node.data.method ?? ''} onChange={(e) => onText('method', e.target.value)} />
