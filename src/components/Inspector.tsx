@@ -57,7 +57,7 @@ function Inspector() {
     return <aside className="w-80 border-l border-slate-800 p-4 text-sm text-slate-400">Select a node or connection to edit properties.</aside>;
   }
 
-  const canEditSchema = node.type === 'output' || node.type === 'error' || node.type === 'input';
+  const canEditSchema = node.type === 'output' || node.type === 'error' || node.type === 'input' || node.type === 'endpoint';
 
   return (
     <aside className="w-80 border-l border-slate-800 bg-slate-950/80 p-4 text-sm">
@@ -88,7 +88,7 @@ function Inspector() {
                   {fieldTypes.map((f) => <option key={f}>{f}</option>)}
                 </select>
                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(node.id, field.id, { required: e.target.checked })} />
-                <button className="text-rose-400" onClick={() => removeField(node.id, field.id)} title="Delete field">×</button>
+                <button className="rounded bg-rose-900/70 px-1 text-rose-300 hover:bg-rose-800" onClick={() => removeField(node.id, field.id)} title="Delete field">🗑</button>
               </div>
             ))}
           </div>
