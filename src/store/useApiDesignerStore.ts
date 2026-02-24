@@ -50,6 +50,7 @@ type State = {
   createProject: () => void;
   switchProject: (projectId: string) => void;
   renameProject: (projectId: string, name: string) => void;
+  copyNode: (nodeId: string) => void;
 };
 
 const syncProjects = (state: State, nodes: ApiNode[], edges: ApiEdge[]): ProjectEntry[] =>
@@ -121,7 +122,9 @@ export const useApiDesignerStore = create<State>()(
       addNode: (type) =>
         set((s) => {
           const nodeId = id();
-          const endpoint = s.nodes.find((n) => n.type === 'endpoint');
+          const selectedEndpoint =
+            s.selectedNodeId && s.nodes.find((n) => n.id === s.selectedNodeId && n.type === 'endpoint');
+          const endpoint = selectedEndpoint ?? s.nodes.find((n) => n.type === 'endpoint');
           const base = {
             id: nodeId,
             type,
@@ -250,6 +253,25 @@ export const useApiDesignerStore = create<State>()(
         set((s) => ({
           projects: s.projects.map((p) => (p.id === projectId ? { ...p, name } : p)),
         })),
+      copyNode: (nodeId) =>
+        set((s) => {
+          const source = s.nodes.find((n) => n.id === nodeId);
+          if (!source || source.type === 'endpoint') return s;
+
+          const cloned: ApiNode = {
+            ...source,
+            id: id(),
+            position: { x: source.position.x + 36, y: source.position.y + 36 },
+            selected: false,
+            data: {
+              ...source.data,
+              schema: source.data.schema.map((f) => ({ ...f, id: id() })),
+            },
+          };
+
+          const nodes = [...s.nodes, cloned];
+          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+        }),
     }),
     {
       name: 'api-designer-project',
