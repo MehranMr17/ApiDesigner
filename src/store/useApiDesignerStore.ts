@@ -31,6 +31,8 @@ type State = {
   enabledStatuses: number[];
   projects: ProjectEntry[];
   activeProjectId: string;
+  copiedNode: ApiNode | null;
+  history: Array<{ nodes: ApiNode[]; edges: ApiEdge[]; selectedNodeId: string | null; selectedEdgeId: string | null }>;
   setSelectedNode: (nodeId: string | null) => void;
   setSelectedEdge: (edgeId: string | null) => void;
   onNodesChange: (changes: NodeChange<ApiNode>[]) => void;
@@ -51,12 +53,36 @@ type State = {
   switchProject: (projectId: string) => void;
   renameProject: (projectId: string, name: string) => void;
   copyNode: (nodeId: string) => void;
+  copySelectedNode: () => void;
+  pasteCopiedNode: () => void;
+  undo: () => void;
 };
 
 const syncProjects = (state: State, nodes: ApiNode[], edges: ApiEdge[]): ProjectEntry[] =>
   state.projects.map((p) =>
     p.id === state.activeProjectId ? { ...p, nodes, edges, updatedAt: Date.now() } : p,
   );
+
+const pushHistory = (state: State) => [
+  ...state.history,
+  {
+    nodes: state.nodes,
+    edges: state.edges,
+    selectedNodeId: state.selectedNodeId,
+    selectedEdgeId: state.selectedEdgeId,
+  },
+].slice(-50);
+
+const cloneNodeForPaste = (source: ApiNode): ApiNode => ({
+  ...source,
+  id: id(),
+  position: { x: source.position.x + 40, y: source.position.y + 40 },
+  selected: false,
+  data: {
+    ...source.data,
+    schema: source.data.schema.map((f) => ({ ...f, id: id() })),
+  },
+});
 
 export const useApiDesignerStore = create<State>()(
   persist(
@@ -68,6 +94,8 @@ export const useApiDesignerStore = create<State>()(
       enabledStatuses: [200, 201, 400, 401, 403, 404, 409, 500],
       projects: [initialProjectEntry],
       activeProjectId: initialProjectEntry.id,
+      copiedNode: null,
+      history: [],
       setSelectedNode: (selectedNodeId) => set({ selectedNodeId, selectedEdgeId: null }),
       setSelectedEdge: (selectedEdgeId) => set({ selectedEdgeId, selectedNodeId: null }),
       onNodesChange: (changes) =>
@@ -100,7 +128,7 @@ export const useApiDesignerStore = create<State>()(
       updateNode: (nodeId, patch) =>
         set((s) => {
           const nodes = s.nodes.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, ...patch } } : n));
-          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), projects: syncProjects(s, nodes, s.edges) };
         }),
       updateEdge: (edgeId, patch) =>
         set((s) => {
@@ -151,14 +179,14 @@ export const useApiDesignerStore = create<State>()(
             });
           }
           const nodes = [...s.nodes, base];
-          return { nodes, edges, projects: syncProjects(s, nodes, edges) };
+          return { nodes, edges, history: pushHistory(s), projects: syncProjects(s, nodes, edges) };
         }),
       deleteSelected: () =>
         set((s) => {
           if (s.selectedNodeId) {
             const nodes = s.nodes.filter((n) => n.id !== s.selectedNodeId);
             const edges = s.edges.filter((e) => e.source !== s.selectedNodeId && e.target !== s.selectedNodeId);
-            return { nodes, edges, selectedNodeId: null, projects: syncProjects(s, nodes, edges) };
+            return { nodes, edges, selectedNodeId: null, history: pushHistory(s), projects: syncProjects(s, nodes, edges) };
           }
           if (s.selectedEdgeId) {
             const edges = s.edges.filter((e) => e.id !== s.selectedEdgeId);
@@ -258,19 +286,43 @@ export const useApiDesignerStore = create<State>()(
           const source = s.nodes.find((n) => n.id === nodeId);
           if (!source || source.type === 'endpoint') return s;
 
-          const cloned: ApiNode = {
-            ...source,
-            id: id(),
-            position: { x: source.position.x + 36, y: source.position.y + 36 },
-            selected: false,
-            data: {
-              ...source.data,
-              schema: source.data.schema.map((f) => ({ ...f, id: id() })),
-            },
-          };
+          const cloned = cloneNodeForPaste(source);
 
           const nodes = [...s.nodes, cloned];
-          return { nodes, projects: syncProjects(s, nodes, s.edges) };
+          return { nodes, history: pushHistory(s), projects: syncProjects(s, nodes, s.edges) };
+        }),
+      copySelectedNode: () =>
+        set((s) => {
+          const source = s.nodes.find((n) => n.id === s.selectedNodeId);
+          if (!source || source.type === 'endpoint') return s;
+          return { copiedNode: source };
+        }),
+      pasteCopiedNode: () =>
+        set((s) => {
+          if (!s.copiedNode || s.copiedNode.type === 'endpoint') return s;
+          const cloned = cloneNodeForPaste(s.copiedNode);
+          const nodes = [...s.nodes, cloned];
+          return {
+            nodes,
+            selectedNodeId: cloned.id,
+            selectedEdgeId: null,
+            history: pushHistory(s),
+            projects: syncProjects(s, nodes, s.edges),
+          };
+        }),
+      undo: () =>
+        set((s) => {
+          const last = s.history[s.history.length - 1];
+          if (!last) return s;
+          const history = s.history.slice(0, -1);
+          return {
+            nodes: last.nodes,
+            edges: last.edges,
+            selectedNodeId: last.selectedNodeId,
+            selectedEdgeId: last.selectedEdgeId,
+            history,
+            projects: syncProjects(s, last.nodes, last.edges),
+          };
         }),
     }),
     {
