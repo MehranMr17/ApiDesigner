@@ -12,52 +12,70 @@ export const makeField = (name: string, type: SchemaField['type'], required = tr
   required,
 });
 
+const endpointId = id();
+const outputId = id();
+const inputId = id();
+
+export const defaultProject = (): ApiProject => ({
+  selectedNodeId: null,
+  nodes: [
+    {
+      id: inputId,
+      type: 'input',
+      position: { x: 80, y: 220 },
+      data: { title: 'Request Body', schema: [makeField('email', 'string')] },
+    },
+    {
+      id: endpointId,
+      type: 'endpoint',
+      position: { x: 420, y: 200 },
+      data: { title: 'Example Endpoint', method: 'POST', path: '/example', schema: [] },
+    },
+    {
+      id: outputId,
+      type: 'output',
+      position: { x: 780, y: 200 },
+      data: { title: 'Success Response', statusCode: 200, schema: [makeField('id', 'string'), makeField('createdAt', 'string')] },
+    },
+  ],
+  edges: [
+    {
+      id: id(),
+      source: inputId,
+      target: endpointId,
+      label: 'Input',
+      markerEnd: { type: MarkerType.ArrowClosed },
+      data: { label: 'Input' },
+    },
+    {
+      id: id(),
+      source: endpointId,
+      target: outputId,
+      label: 'Success 200',
+      markerEnd: { type: MarkerType.ArrowClosed },
+      data: { label: 'Success 200' },
+    },
+  ],
+});
+
 export const errorDefaultSchema = (): SchemaField[] => [
   makeField('errorCode', 'string'),
   makeField('message', 'string'),
   makeField('metadata', 'object', false),
 ];
 
-export const defaultProject = (): ApiProject => {
-  const endpointId = id();
-  const outputId = id();
-  return {
-    selectedNodeId: null,
-    nodes: [
-      {
-        id: endpointId,
-        type: 'endpoint',
-        position: { x: 280, y: 200 },
-        data: { title: 'Example Endpoint', method: 'POST', path: '/example', schema: [] },
-      },
-      {
-        id: outputId,
-        type: 'output',
-        position: { x: 680, y: 200 },
-        data: {
-          title: 'Success Response',
-          statusCode: 200,
-          schema: [makeField('ok', 'boolean'), makeField('id', 'string')],
-        },
-      },
-    ],
-    edges: [
-      {
-        id: id(),
-        source: endpointId,
-        target: outputId,
-        label: 'Success 200',
-        markerEnd: { type: MarkerType.ArrowClosed },
-        data: { label: 'Success 200' },
-      },
-    ],
-  };
+export const saveProject = (project: ApiProject) => {
+  localStorage.setItem('api-designer-project', JSON.stringify(project));
 };
 
-export const isApiProject = (value: unknown): value is ApiProject => {
-  if (!value || typeof value !== 'object') return false;
-  const v = value as Record<string, unknown>;
-  return Array.isArray(v.nodes) && Array.isArray(v.edges);
+export const loadProject = (): ApiProject => {
+  const raw = localStorage.getItem('api-designer-project');
+  if (!raw) return defaultProject();
+  try {
+    return JSON.parse(raw) as ApiProject;
+  } catch {
+    return defaultProject();
+  }
 };
 
 export const exportOpenApi = (nodes: ApiNode[]) => {

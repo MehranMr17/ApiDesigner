@@ -1,46 +1,20 @@
-# API Designer Pro (Static GitHub Pages Ready)
+# API Designer Pro
 
-Production-grade visual API designer built as a **fully static frontend**:
-- React + TypeScript + Vite
-- Zustand + persist middleware (localStorage)
-- React Flow diagram engine
-- TailwindCSS dark-first UI
-- Framer Motion lightweight animations
-- HashRouter for GitHub Pages compatibility
+A professional, colorful visual API design tool for backend engineers.
 
-## Static-Only Architecture
-- No backend server
-- No database
-- No Firebase / auth / env vars
-- Works as static files on GitHub Pages
+## Highlights
 
-## Key Features
-- Persistent diagram state auto-saved on every change (localStorage)
-- Full restoration on refresh
-- Minimal default project: one `POST /example` endpoint + one `200` output
-- Node CRUD for Inputs / Outputs / Errors
-- Structured JSON field modeling (`name`, `type`, `required`)
-- Default error schema:
-  - `errorCode: string`
-  - `message: string`
-  - `metadata?: object`
-- Status suggestion toggles: `200, 201, 400, 401, 403, 404, 409, 500`
-- Keyboard shortcuts: `N`, `I`, `O`, `E`, `Delete`, `Ctrl+S`
-- Auto-layout + snap-to-grid + zoom/pan + minimap
-- Export options:
-  - Project JSON backup
-  - Import Project JSON restore
-  - OpenAPI JSON export
-  - SVG diagram export
+- Endpoint cards with interactive input/output/error chips and type badges.
+- Data-flow arrows for input→output mapping inside each endpoint and endpoint-to-endpoint links.
+- Click/hover arrow details tooltips + side-panel flow details.
+- Keyboard shortcuts for rapid modeling (`N`, `I`, `O`, `E`, `C`, `L`, `T`, `+`, `-`, `0`).
+- Auto-layout and snapping grid for tidy diagrams.
+- Zoom, pan (Shift+drag or middle mouse), drag-and-drop cards.
+- Dark and light themes.
+- Default common outputs/errors for new endpoints + service-aware error suggestions.
+- OpenAPI 3.1 export + SVG/PNG diagram export.
+- Responsive UI with subtle animations.
 
 ## Run
-```bash
-npm install
-npm run dev
-```
 
-## Build for GitHub Pages
-```bash
-npm run build
-```
-Output is static in `dist/` and works under subpaths via Vite `base: './'` + `HashRouter`.
+Open `index.html` in any modern browser.
