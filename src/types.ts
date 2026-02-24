@@ -19,11 +19,24 @@ export type ApiNodeData = {
   schema: SchemaField[];
 };
 
+export type ApiEdgeData = {
+  label: string;
+  statusCode?: number;
+};
+
 export type ApiNode = Node<ApiNodeData, ApiNodeType>;
-export type ApiEdge = Edge<{ label: string }>;
+export type ApiEdge = Edge<ApiEdgeData>;
 
 export type ApiProject = {
   nodes: ApiNode[];
   edges: ApiEdge[];
   selectedNodeId: string | null;
+};
+
+export type ProjectEntry = {
+  id: string;
+  name: string;
+  nodes: ApiNode[];
+  edges: ApiEdge[];
+  updatedAt: number;
 };

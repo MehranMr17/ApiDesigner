@@ -4,10 +4,10 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const palette = {
-  input: 'border-blue-500/50 bg-blue-500/10 text-blue-200',
-  endpoint: 'border-violet-500/50 bg-violet-500/10 text-violet-200',
-  output: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-200',
-  error: 'border-rose-500/50 bg-rose-500/10 text-rose-200',
+  input: 'border-blue-500 bg-blue-950/90 text-blue-100',
+  endpoint: 'border-violet-500 bg-violet-950/85 text-violet-100',
+  output: 'border-emerald-500 bg-emerald-950/90 text-emerald-100',
+  error: 'border-rose-500 bg-rose-950/90 text-rose-100',
 };
 
 function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
@@ -20,8 +20,8 @@ function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
     >
       <Handle type="target" position={Position.Left} className="!h-3 !w-3 !bg-slate-100" />
       <div className="font-semibold text-sm">{data.title}</div>
-      {data.method && data.path && <div className="text-[11px] opacity-80">{data.method} {data.path}</div>}
-      {data.statusCode && <div className="text-[11px] mt-1">Status: {data.statusCode}</div>}
+      {data.method && data.path && <div className="text-[11px] opacity-90">{data.method} {data.path}</div>}
+      {data.statusCode && <div className="text-[11px] mt-1 opacity-90">Status: {data.statusCode}</div>}
       <div className="mt-2 space-y-1">
         {data.schema.slice(0, 3).map((f) => <div key={f.id} className="truncate">{f.required ? '●' : '○'} {f.name}: {f.type}</div>)}
       </div>

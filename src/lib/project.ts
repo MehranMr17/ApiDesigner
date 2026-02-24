@@ -48,7 +48,7 @@ export const defaultProject = (): ApiProject => {
         target: outputId,
         label: 'Success 200',
         markerEnd: { type: MarkerType.ArrowClosed },
-        data: { label: 'Success 200' },
+        data: { label: 'Success 200', statusCode: 200 },
       },
     ],
   };

@@ -12,6 +12,12 @@ function Toolbar({ exportSvg }: Props) {
   const nodes = useApiDesignerStore((s) => s.nodes);
   const importProject = useApiDesignerStore((s) => s.importProject);
   const resetDefault = useApiDesignerStore((s) => s.resetDefault);
+  const projects = useApiDesignerStore((s) => s.projects);
+  const activeProjectId = useApiDesignerStore((s) => s.activeProjectId);
+  const switchProject = useApiDesignerStore((s) => s.switchProject);
+  const createProject = useApiDesignerStore((s) => s.createProject);
+  const renameProject = useApiDesignerStore((s) => s.renameProject);
+
   const fileRef = useRef<HTMLInputElement>(null);
 
   const exportProject = () => {
@@ -37,10 +43,26 @@ function Toolbar({ exportSvg }: Props) {
     <header className="border-b border-slate-800 bg-slate-950/90 p-3 text-xs text-slate-300">
       <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={handleImportFile} />
       <div className="mb-2 flex flex-wrap gap-2">
+        <select
+          className="rounded border border-slate-700 bg-slate-900 px-2 py-1"
+          value={activeProjectId}
+          onChange={(e) => switchProject(e.target.value)}
+        >
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        <button className="rounded bg-slate-700 px-2 py-1" onClick={createProject}>+ Project</button>
+        <button className="rounded bg-slate-700 px-2 py-1" onClick={() => {
+          const current = projects.find((p) => p.id === activeProjectId);
+          const name = prompt('Project name', current?.name ?? 'Project');
+          if (name) renameProject(activeProjectId, name.trim());
+        }}>Rename</button>
+
         <button className="rounded bg-violet-600 px-2 py-1" onClick={() => addNode('endpoint')}>+ Endpoint (N)</button>
-        <button className="rounded bg-blue-600 px-2 py-1" onClick={() => addNode('input')}>+ Input (I)</button>
-        <button className="rounded bg-emerald-600 px-2 py-1" onClick={() => addNode('output')}>+ Output (O)</button>
-        <button className="rounded bg-rose-600 px-2 py-1" onClick={() => addNode('error')}>+ Error (E)</button>
+        <button className="rounded bg-blue-700 px-2 py-1 text-blue-100" onClick={() => addNode('input')}>+ Input (I)</button>
+        <button className="rounded bg-emerald-700 px-2 py-1 text-emerald-100" onClick={() => addNode('output')}>+ Output (O)</button>
+        <button className="rounded bg-rose-700 px-2 py-1 text-rose-100" onClick={() => addNode('error')}>+ Error (E)</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={autoLayout}>Auto Layout</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={() => download('openapi.json', JSON.stringify(exportOpenApi(nodes), null, 2), 'application/json')}>Export OpenAPI</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={exportProject}>Export Project</button>
