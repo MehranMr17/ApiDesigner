@@ -24,28 +24,35 @@ function Canvas() {
   const setSelectedNode = useApiDesignerStore((s) => s.setSelectedNode);
   const addNode = useApiDesignerStore((s) => s.addNode);
   const deleteSelected = useApiDesignerStore((s) => s.deleteSelected);
-  const saveLocal = useApiDesignerStore((s) => s.saveLocal);
 
-  const nodeTypes = useMemo(() => ({ input: ApiNodeCard, endpoint: ApiNodeCard, output: ApiNodeCard, error: ApiNodeCard }), []);
+  const nodeTypes = useMemo(
+    () => ({ input: ApiNodeCard, endpoint: ApiNodeCard, output: ApiNodeCard, error: ApiNodeCard }),
+    [],
+  );
 
-  const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
-    setSelectedNode(params.nodes[0]?.id ?? null);
-  }, [setSelectedNode]);
+  const onSelectionChange = useCallback(
+    (params: OnSelectionChangeParams) => {
+      setSelectedNode(params.nodes[0]?.id ?? null);
+    },
+    [setSelectedNode],
+  );
 
-  const onKeyDown = useCallback((event: KeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
-      event.preventDefault();
-      saveLocal();
-      return;
-    }
-    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
-    const key = event.key.toLowerCase();
-    if (key === 'n') addNode('endpoint');
-    if (key === 'i') addNode('input');
-    if (key === 'o') addNode('output');
-    if (key === 'e') addNode('error');
-    if (event.key === 'Delete') deleteSelected();
-  }, [addNode, deleteSelected, saveLocal]);
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        return;
+      }
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
+      const key = event.key.toLowerCase();
+      if (key === 'n') addNode('endpoint');
+      if (key === 'i') addNode('input');
+      if (key === 'o') addNode('output');
+      if (key === 'e') addNode('error');
+      if (event.key === 'Delete') deleteSelected();
+    },
+    [addNode, deleteSelected],
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown);
@@ -91,7 +98,12 @@ function Canvas() {
         </div>
         <Inspector />
       </div>
-      <button className="absolute bottom-3 left-3 rounded bg-slate-800 px-2 py-1 text-xs text-slate-300" onClick={() => fitView()}>Fit View</button>
+      <button
+        className="absolute bottom-3 left-3 rounded bg-slate-800 px-2 py-1 text-xs text-slate-300"
+        onClick={() => fitView()}
+      >
+        Fit View
+      </button>
     </div>
   );
 }

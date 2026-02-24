@@ -1,91 +1,12 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Designer Pro</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body data-theme="dark">
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-dot"></div>
-        <div>
-          <h1>API Designer Pro</h1>
-          <p>Visual endpoint architecture studio</p>
-        </div>
-      </div>
-      <nav class="top-actions">
-        <button id="add-endpoint-btn" class="btn btn-primary" title="N">+ Endpoint</button>
-        <button id="connect-btn" class="btn" title="C">Connect</button>
-        <button id="auto-layout-btn" class="btn" title="L">Auto Layout</button>
-        <button id="theme-btn" class="btn" title="T">Theme</button>
-        <button id="export-image-btn" class="btn">Export PNG</button>
-        <button id="export-svg-btn" class="btn">Export SVG</button>
-        <button id="export-openapi-btn" class="btn">Export OpenAPI</button>
-      </nav>
-    </header>
-
-    <main class="workspace-layout">
-      <aside class="left-menu">
-        <h2>Toolkit</h2>
-        <div class="menu-group">
-          <p class="menu-title">Keyboard shortcuts</p>
-          <ul>
-            <li><strong>N</strong> new endpoint</li>
-            <li><strong>I / O / E</strong> add input/output/error</li>
-            <li><strong>C</strong> connect mode</li>
-            <li><strong>L</strong> auto layout</li>
-            <li><strong>T</strong> toggle theme</li>
-            <li><strong>+</strong> / <strong>-</strong> zoom</li>
-            <li><strong>0</strong> reset zoom & pan</li>
-          </ul>
-        </div>
-        <div class="legend">
-          <p class="menu-title">Node legend</p>
-          <div><span class="badge b-input">⤓</span> Input node</div>
-          <div><span class="badge b-output">✓</span> Success output</div>
-          <div><span class="badge b-error">⚠</span> Error response</div>
-          <div><span class="badge b-flow">→</span> Data flow arrow</div>
-        </div>
-      </aside>
-
-      <section class="diagram-shell">
-        <div class="toolbar">
-          <span id="connect-state" class="status">Mode: Select</span>
-          <span id="selection-state" class="status">No endpoint selected</span>
-          <span id="zoom-state" class="status">Zoom: 100%</span>
-        </div>
-        <div id="diagram-area" class="diagram-area">
-          <div id="viewport" class="viewport">
-            <svg id="connection-layer" class="connection-layer"></svg>
-          </div>
-          <div id="flow-tooltip" class="flow-tooltip hidden"></div>
-        </div>
-      </section>
-
-      <aside class="details-panel">
-        <h2>Details</h2>
-        <p class="muted">Select an endpoint or arrow for details and quick edits.</p>
-        <div id="details-content"></div>
-      </aside>
-    </main>
-  </div>
-
-  <template id="endpoint-card-template">
-    <article class="endpoint-card">
-      <header>
-        <h3></h3>
-        <span class="method-pill"></span>
-      </header>
-      <p class="path"></p>
-      <div class="port-row input-ports"></div>
-      <div class="port-row output-ports"></div>
-      <div class="port-row error-ports"></div>
-    </article>
-  </template>
-
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Designer Pro</title>
+  </head>
+  <body class="bg-slate-950">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
