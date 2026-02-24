@@ -1,8 +1,27 @@
-import { memo, useRef, type ChangeEventHandler } from 'react';
+import { memo, useEffect, useRef, type ChangeEventHandler } from 'react';
 import { commonStatuses, download, exportOpenApi, isApiProject } from '../lib/project';
 import { selectProject, useApiDesignerStore } from '../store/useApiDesignerStore';
 
 type Props = { exportSvg: () => void };
+
+const encodeProjectToShareLink = () => {
+  const state = useApiDesignerStore.getState();
+  const project = JSON.stringify(selectProject(state));
+  const encoded = btoa(encodeURIComponent(project));
+  const url = new URL(window.location.href);
+  url.searchParams.set('share', encoded);
+  return url.toString();
+};
+
+const decodeSharedProject = (encoded: string) => {
+  try {
+    const decoded = decodeURIComponent(atob(encoded));
+    const parsed = JSON.parse(decoded);
+    return isApiProject(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
 
 function Toolbar({ exportSvg }: Props) {
   const addNode = useApiDesignerStore((s) => s.addNode);
@@ -20,9 +39,30 @@ function Toolbar({ exportSvg }: Props) {
 
   const fileRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const shareParam = new URL(window.location.href).searchParams.get('share');
+    if (!shareParam) return;
+    const sharedProject = decodeSharedProject(shareParam);
+    if (!sharedProject) {
+      alert('Shared link is invalid or corrupted.');
+      return;
+    }
+    importProject(sharedProject);
+  }, [importProject]);
+
   const exportProject = () => {
     const state = useApiDesignerStore.getState();
     download('api-designer-project.json', JSON.stringify(selectProject(state), null, 2), 'application/json');
+  };
+
+  const shareProject = async () => {
+    const shareUrl = encodeProjectToShareLink();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Share link copied to clipboard.');
+    } catch {
+      prompt('Copy this share link:', shareUrl);
+    }
   };
 
   const handleImportFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
@@ -66,6 +106,7 @@ function Toolbar({ exportSvg }: Props) {
         <button className="rounded bg-slate-700 px-2 py-1" onClick={autoLayout}>Auto Layout</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={() => download('openapi.json', JSON.stringify(exportOpenApi(nodes), null, 2), 'application/json')}>Export OpenAPI</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={exportProject}>Export Project</button>
+        <button className="rounded bg-indigo-700 px-2 py-1" onClick={shareProject}>Share Link</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={() => fileRef.current?.click()}>Import Project</button>
         <button className="rounded bg-slate-700 px-2 py-1" onClick={exportSvg}>Export SVG</button>
         <button className="rounded bg-slate-800 px-2 py-1" onClick={resetDefault}>Reset Default</button>
