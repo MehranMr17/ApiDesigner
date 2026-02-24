@@ -24,14 +24,17 @@ function Inspector() {
   );
 
   if (edge) {
+    const baseLabel = edge.data?.label ?? String(edge.label ?? 'Flow');
+    const keyword = baseLabel.split(' ')[0] || 'Flow';
+
     return (
       <aside className="w-80 border-l border-slate-800 bg-slate-950/80 p-4 text-sm">
         <h2 className="mb-3 text-sm font-semibold text-slate-100">Connection Properties</h2>
         <label className="mb-2 block text-xs text-slate-400">Label</label>
         <input
           className="mb-2 w-full rounded border border-slate-700 bg-slate-900 px-2 py-1"
-          value={edge.label ?? edge.data?.label ?? ''}
-          onChange={(e) => updateEdge(edge.id, { label: e.target.value, data: { ...edge.data, label: e.target.value } })}
+          value={baseLabel}
+          onChange={(e) => updateEdge(edge.id, { label: e.target.value })}
         />
         <label className="mb-2 block text-xs text-slate-400">Status Code</label>
         <input
@@ -41,8 +44,8 @@ function Inspector() {
           onChange={(e) => {
             const statusCode = e.target.value ? Number(e.target.value) : undefined;
             updateEdge(edge.id, {
-              data: { ...edge.data, statusCode, label: edge.label ?? '' },
-              label: statusCode ? `${edge.label?.split(' ')[0] ?? 'Flow'} ${statusCode}` : edge.label,
+              statusCode,
+              label: statusCode ? `${keyword} ${statusCode}` : baseLabel,
             });
           }}
         />

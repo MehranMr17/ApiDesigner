@@ -37,7 +37,7 @@ type State = {
   onEdgesChange: (changes: EdgeChange<ApiEdge>[]) => void;
   onConnect: (connection: Connection) => void;
   updateNode: (nodeId: string, patch: Partial<ApiNode['data']>) => void;
-  updateEdge: (edgeId: string, patch: Partial<ApiEdge>) => void;
+  updateEdge: (edgeId: string, patch: { label?: string; statusCode?: number }) => void;
   addNode: (type: ApiNodeType) => void;
   deleteSelected: () => void;
   addField: (nodeId: string) => void;
@@ -103,16 +103,19 @@ export const useApiDesignerStore = create<State>()(
         }),
       updateEdge: (edgeId, patch) =>
         set((s) => {
-          const edges = s.edges.map((e) =>
-            e.id === edgeId
-              ? {
-                  ...e,
-                  ...patch,
-                  label: patch.label ?? e.label,
-                  data: { ...e.data, ...patch.data },
-                }
-              : e,
-          );
+          const edges: ApiEdge[] = s.edges.map((e) => {
+            if (e.id !== edgeId) return e;
+            const nextLabel = patch.label ?? e.data?.label ?? String(e.label ?? 'Flow');
+            return {
+              ...e,
+              label: nextLabel,
+              data: {
+                ...e.data,
+                label: nextLabel,
+                statusCode: patch.statusCode ?? e.data?.statusCode,
+              },
+            };
+          });
           return { edges, projects: syncProjects(s, s.nodes, edges) };
         }),
       addNode: (type) =>
