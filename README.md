@@ -1,27 +1,20 @@
-# API Designer Pro (React + TypeScript)
+# API Designer Pro
 
-Production-grade visual API designer built with:
-- React + TypeScript
-- Zustand global store
-- React Flow graph rendering
-- TailwindCSS (dark-first)
-- Framer Motion animations
+A professional, colorful visual API design tool for backend engineers.
 
-## Features
-- Stable SPA architecture (no full page reloads)
-- Endpoint/Input/Output/Error nodes with right-side property inspector
-- Structured JSON schema fields (name, type, required)
-- Default error schema (`errorCode`, `message`, `metadata?`)
-- HTTP status suggestions toggle (200, 201, 400, 401, 403, 404, 409, 500)
-- Arrow-based flows with labels
-- Shortcuts: `N`, `I`, `O`, `E`, `Delete`, `Ctrl+S`
-- Auto layout + snap-to-grid
-- Zoom, pan, minimap, controls
-- Local persistence via `localStorage`
-- Export OpenAPI JSON and SVG diagram
+## Highlights
+
+- Endpoint cards with interactive input/output/error chips and type badges.
+- Data-flow arrows for input→output mapping inside each endpoint and endpoint-to-endpoint links.
+- Click/hover arrow details tooltips + side-panel flow details.
+- Keyboard shortcuts for rapid modeling (`N`, `I`, `O`, `E`, `C`, `L`, `T`, `+`, `-`, `0`).
+- Auto-layout and snapping grid for tidy diagrams.
+- Zoom, pan (Shift+drag or middle mouse), drag-and-drop cards.
+- Dark and light themes.
+- Default common outputs/errors for new endpoints + service-aware error suggestions.
+- OpenAPI 3.1 export + SVG/PNG diagram export.
+- Responsive UI with subtle animations.
 
 ## Run
-```bash
-npm install
-npm run dev
-```
+
+Open `index.html` in any modern browser.
