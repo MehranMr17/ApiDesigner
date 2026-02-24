@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react';
 import { memo, useCallback } from 'react';
 import { useApiDesignerStore } from '../store/useApiDesignerStore';
 import type { FieldType } from '../types';
@@ -80,15 +81,21 @@ function Inspector() {
             <h3 className="text-xs uppercase tracking-wide text-slate-400">JSON Fields</h3>
             <button className="rounded bg-slate-800 px-2 py-1 text-xs" onClick={() => addField(node.id)}>+ Field</button>
           </div>
-          <div className="mt-2 space-y-2">
+          <div className="mt-2 flex max-h-[62vh] flex-col gap-2 overflow-auto pr-1">
             {node.data.schema.map((field) => (
-              <div key={field.id} className="grid grid-cols-[1fr_88px_30px_24px] gap-1">
+              <div key={field.id} className="grid grid-cols-[1fr_88px_30px_34px] gap-1">
                 <input className="rounded border border-slate-700 bg-slate-900 px-2 py-1" value={field.name} onChange={(e) => updateField(node.id, field.id, { name: e.target.value })} />
                 <select className="rounded border border-slate-700 bg-slate-900 px-1 py-1" value={field.type} onChange={(e) => updateField(node.id, field.id, { type: e.target.value as FieldType })}>
                   {fieldTypes.map((f) => <option key={f}>{f}</option>)}
                 </select>
                 <input type="checkbox" checked={field.required} onChange={(e) => updateField(node.id, field.id, { required: e.target.checked })} />
-                <button className="rounded bg-rose-900/70 px-1 text-rose-300 hover:bg-rose-800" onClick={() => removeField(node.id, field.id)} title="Delete field">🗑</button>
+                <button
+                  className="flex items-center justify-center rounded bg-rose-900/70 text-rose-300 hover:bg-rose-800"
+                  onClick={() => removeField(node.id, field.id)}
+                  title="Delete field"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             ))}
           </div>

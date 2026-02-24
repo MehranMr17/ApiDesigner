@@ -112,7 +112,7 @@ function Canvas() {
         </div>
         <Inspector />
 
-        <div className="absolute bottom-3 left-3 flex flex-col gap-2">
+        <div className="absolute bottom-20 left-3 grid gap-2">
           <div className="rounded-md border border-slate-700 bg-slate-900/90 px-3 py-2 text-[11px] text-slate-200 shadow-lg">
             <div className="font-medium">Helper</div>
             <div>N / I / O / E: add nodes</div>
@@ -120,7 +120,7 @@ function Canvas() {
           </div>
 
           <button
-            className="self-start rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-100"
+            className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-xs text-slate-100"
             onClick={() => fitView()}
           >
             Fit View

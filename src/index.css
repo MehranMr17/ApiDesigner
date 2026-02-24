@@ -30,3 +30,9 @@ html, body, #root { height: 100%; margin: 0; }
 .react-flow__controls-button:hover {
   background: rgb(30 41 59) !important;
 }
+
+/* Remove default React Flow white node surface */
+.react-flow__node {
+  background: transparent !important;
+  box-shadow: none !important;
+}

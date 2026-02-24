@@ -1,6 +1,6 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, useUpdateNodeInternals, type NodeProps } from '@xyflow/react';
 import type { ApiNode } from '../types';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const palette = {
@@ -22,20 +22,25 @@ const palette = {
   },
 };
 
-function ApiNodeCard({ data, type, selected }: NodeProps<ApiNode>) {
+function ApiNodeCard({ id, data, type, selected }: NodeProps<ApiNode>) {
   const t = (type ?? 'endpoint') as keyof typeof palette;
+  const updateNodeInternals = useUpdateNodeInternals();
+
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [data.schema.length, id, updateNodeInternals]);
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`min-w-[260px] max-w-[420px] rounded-xl border bg-slate-900/95 p-3 text-xs shadow-lg ${palette[t].shell} ${selected ? 'ring-2 ring-violet-400' : ''}`}
+      className={`min-w-[260px] w-fit rounded-xl border bg-slate-900/95 p-3 text-xs shadow-lg ${palette[t].shell} ${selected ? 'ring-2 ring-violet-400' : ''}`}
     >
       <Handle type="target" position={Position.Left} className={`!h-3 !w-3 !border ${palette[t].handle}`} />
       <div className="font-semibold text-sm">{data.title}</div>
       {data.method && data.path && <div className="text-[11px] opacity-90">{data.method} {data.path}</div>}
       {data.statusCode && <div className="text-[11px] mt-1 opacity-90">Status: {data.statusCode}</div>}
-      <div className="mt-2 space-y-1">
+      <div className="mt-2 flex flex-col gap-1">
         {data.schema.map((f) => (
           <div key={f.id} className="whitespace-nowrap">{f.required ? '●' : '○'} {f.name}: {f.type}</div>
         ))}
