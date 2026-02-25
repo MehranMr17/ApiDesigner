@@ -30,6 +30,7 @@ function Canvas() {
   const copySelectedNode = useApiDesignerStore((s) => s.copySelectedNode);
   const pasteCopiedNode = useApiDesignerStore((s) => s.pasteCopiedNode);
   const undo = useApiDesignerStore((s) => s.undo);
+  const redo = useApiDesignerStore((s) => s.redo);
 
   const nodeTypes = useMemo(
     () => ({ input: ApiNodeCard, endpoint: ApiNodeCard, output: ApiNodeCard, error: ApiNodeCard }),
@@ -51,10 +52,16 @@ function Canvas() {
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      const isEditableTarget =
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement ||
+        (event.target instanceof HTMLElement && event.target.isContentEditable);
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
         return;
       }
+      if (isEditableTarget) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c') {
         if (selectedNodeId) {
           event.preventDefault();
@@ -69,10 +76,18 @@ function Canvas() {
       }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault();
-        undo();
+        if (event.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
         return;
       }
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+        event.preventDefault();
+        redo();
+        return;
+      }
       const key = event.key.toLowerCase();
       if (key === 'n') addNode('endpoint');
       if (key === 'i') addNode('input');
@@ -80,7 +95,7 @@ function Canvas() {
       if (key === 'e') addNode('error');
       if (event.key === 'Delete') deleteSelected();
     },
-    [addNode, copySelectedNode, deleteSelected, pasteCopiedNode, selectedNodeId, undo],
+    [addNode, copySelectedNode, deleteSelected, pasteCopiedNode, redo, selectedNodeId, undo],
   );
 
   useEffect(() => {
@@ -117,6 +132,7 @@ function Canvas() {
             onEdgesChange={onEdgesChange}
             onSelectionChange={onSelectionChange}
             fitView
+            minZoom={0.01}
             snapToGrid
             snapGrid={[20, 20]}
           >
@@ -127,17 +143,19 @@ function Canvas() {
               nodeStrokeWidth={2}
               className="!border !border-slate-600 !bg-slate-900/90 !shadow-xl"
             />
-            <Controls className="!bg-slate-900/90 !border !border-slate-700 !rounded-md !text-slate-200" />
+            <Controls position="top-left" className="app-controls !bg-slate-900/90 !border !border-slate-700 !rounded-md !text-slate-200" />
             <Background gap={20} color="#1e293b" />
           </ReactFlow>
         </div>
         <Inspector />
 
-        <div className="absolute bottom-3 left-3 flex items-end gap-3">
+        <div className="absolute left-3 top-3 z-20 flex items-start gap-3">
           <div className="rounded-md border border-slate-700 bg-slate-900/90 px-3 py-2 text-[11px] text-slate-200 shadow-lg">
             <div className="font-medium">Helper</div>
             <div>N / I / O / E: add nodes</div>
             <div>Delete: remove selected node/edge</div>
+            <div>Ctrl/Cmd + C/V: copy & paste node</div>
+            <div>Ctrl/Cmd + Z / Ctrl/Cmd + Shift + Z: undo / redo</div>
           </div>
 
           <button
