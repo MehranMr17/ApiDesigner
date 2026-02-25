@@ -5,6 +5,25 @@ import { useApiDesignerStore } from '../store/useApiDesignerStore';
 
 type Props = { exportSvg: () => void };
 
+const encodeProjectToShareLink = () => {
+  const state = useApiDesignerStore.getState();
+  const project = JSON.stringify(selectProject(state));
+  const encoded = btoa(encodeURIComponent(project));
+  const url = new URL(window.location.href);
+  url.searchParams.set('share', encoded);
+  return url.toString();
+};
+
+const decodeSharedProject = (encoded: string) => {
+  try {
+    const decoded = decodeURIComponent(atob(encoded));
+    const parsed = JSON.parse(decoded);
+    return isApiProject(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
 function Toolbar({ exportSvg }: Props) {
   const addNode = useApiDesignerStore((s) => s.addNode);
   const autoLayout = useApiDesignerStore((s) => s.autoLayout);
@@ -45,6 +64,16 @@ function Toolbar({ exportSvg }: Props) {
     try {
       await navigator.clipboard.writeText(shareUrl);
       alert('Compressed share link copied to clipboard.');
+    } catch {
+      prompt('Copy this share link:', shareUrl);
+    }
+  };
+
+  const shareProject = async () => {
+    const shareUrl = encodeProjectToShareLink();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Share link copied to clipboard.');
     } catch {
       prompt('Copy this share link:', shareUrl);
     }
