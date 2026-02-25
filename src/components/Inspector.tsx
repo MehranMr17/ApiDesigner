@@ -1,4 +1,3 @@
-import { Trash2 } from 'lucide-react';
 import { memo, useCallback } from 'react';
 import { useApiDesignerStore } from '../store/useApiDesignerStore';
 import type { FieldType } from '../types';
@@ -98,7 +97,7 @@ function Inspector() {
                   onClick={() => removeField(node.id, field.id)}
                   title="Delete field"
                 >
-                  <Trash2 size={14} />
+                  <span className="text-sm leading-none">×</span>
                 </button>
               </div>
             ))}

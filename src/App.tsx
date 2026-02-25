@@ -143,13 +143,13 @@ function Canvas() {
               nodeStrokeWidth={2}
               className="!border !border-slate-600 !bg-slate-900/90 !shadow-xl"
             />
-            <Controls position="top-left" className="!bg-slate-900/90 !border !border-slate-700 !rounded-md !text-slate-200" />
+            <Controls position="top-left" className="app-controls !bg-slate-900/90 !border !border-slate-700 !rounded-md !text-slate-200" />
             <Background gap={20} color="#1e293b" />
           </ReactFlow>
         </div>
         <Inspector />
 
-        <div className="absolute left-3 top-3 flex items-start gap-3">
+        <div className="absolute left-3 top-3 z-20 flex items-start gap-3">
           <div className="rounded-md border border-slate-700 bg-slate-900/90 px-3 py-2 text-[11px] text-slate-200 shadow-lg">
             <div className="font-medium">Helper</div>
             <div>N / I / O / E: add nodes</div>

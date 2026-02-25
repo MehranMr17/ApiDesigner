@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, type ChangeEventHandler } from 'react';
 import { commonStatuses, download, exportOpenApi, isApiProject } from '../lib/project';
-import { selectProject, useApiDesignerStore } from '../store/useApiDesignerStore';
+import { buildShareLink, decodeSharedProject } from '../lib/share';
+import { useApiDesignerStore } from '../store/useApiDesignerStore';
 
 type Props = { exportSvg: () => void };
 
@@ -42,17 +43,30 @@ function Toolbar({ exportSvg }: Props) {
   useEffect(() => {
     const shareParam = new URL(window.location.href).searchParams.get('share');
     if (!shareParam) return;
-    const sharedProject = decodeSharedProject(shareParam);
-    if (!sharedProject) {
-      alert('Shared link is invalid or corrupted.');
-      return;
-    }
-    importProject(sharedProject);
+
+    void (async () => {
+      const sharedProject = await decodeSharedProject(shareParam);
+      if (!sharedProject) {
+        alert('Shared link is invalid or corrupted.');
+        return;
+      }
+      importProject(sharedProject);
+    })();
   }, [importProject]);
 
   const exportProject = () => {
     const state = useApiDesignerStore.getState();
-    download('api-designer-project.json', JSON.stringify(selectProject(state), null, 2), 'application/json');
+    download('api-designer-project.json', JSON.stringify(state.projects.find((project) => project.id === state.activeProjectId) ?? state.projects[0], null, 2), 'application/json');
+  };
+
+  const shareProject = async () => {
+    const shareUrl = await buildShareLink();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Compressed share link copied to clipboard.');
+    } catch {
+      prompt('Copy this share link:', shareUrl);
+    }
   };
 
   const shareProject = async () => {
@@ -82,7 +96,15 @@ function Toolbar({ exportSvg }: Props) {
   return (
     <header className="border-b border-slate-800 bg-slate-950/90 p-3 text-xs text-slate-300">
       <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={handleImportFile} />
-      <div className="mb-2 flex flex-wrap gap-2">
+      <div className="mb-2 flex flex-wrap items-center gap-3">
+        <div className="mr-2 flex items-center gap-2 rounded-md border border-cyan-600/40 bg-slate-900/90 px-2 py-1">
+          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-cyan-400 to-violet-500 text-[11px] font-bold text-slate-950">M</div>
+          <div>
+            <div className="text-[11px] font-semibold text-cyan-300">MeRoS Api Desiner</div>
+            <div className="text-[10px] text-slate-500">Visual API workflow designer</div>
+          </div>
+        </div>
+
         <select
           className="rounded border border-slate-700 bg-slate-900 px-2 py-1"
           value={activeProjectId}
